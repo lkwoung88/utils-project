@@ -6,12 +6,19 @@ import com.example.excel.feature.header.ExcelHeader;
 import com.example.excel.feature.response.InputExcelResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -158,5 +165,49 @@ public class ExcelService {
         response.setErrorMessage(errorMessage);
 
         return response;
+    }
+
+    public void downloadExcelForm(String kind, HttpServletResponse response) {
+
+        log.info("IN TO ExcelService.downloadExcelForm");
+
+        try {
+            ByteArrayInputStream byteArrayInputStream = null;
+
+            if ("book".equals(kind)) {
+                byteArrayInputStream = this.makeExcelForm(ExcelHeader.bookHeaderForm);
+            } else if ("cd".equals(kind)) {
+                byteArrayInputStream = this.makeExcelForm(ExcelHeader.cdHeaderForm);
+            }
+
+            IOUtils.copy(byteArrayInputStream, response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        response.setHeader("Content-Disposition", "attachment;filename=form.xlsx");
+        response.setContentType("application/octet-stream");
+    }
+
+    public ByteArrayInputStream makeExcelForm(List<String> header) throws IOException {
+
+        log.info("IN TO ExcelService.makeExcelForm");
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("sheet1");
+
+        int rowIndex = 1;
+        int colSize = header.size();
+
+        XSSFRow row = sheet.createRow(rowIndex);
+
+        for (int i = 0; i < colSize; i++) {
+            XSSFCell cell = row.createCell(i + 1);
+            cell.setCellValue(header.get(i));
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        workbook.write(byteArrayOutputStream);
+        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
     }
 }
