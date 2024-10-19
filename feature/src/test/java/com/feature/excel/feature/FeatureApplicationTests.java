@@ -1,4 +1,4 @@
-package com.example.excel.feature;
+package com.feature.excel.feature;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

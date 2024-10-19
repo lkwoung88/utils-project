@@ -1,8 +1,10 @@
-package com.example.excel.feature.controller;
+package com.feature.excel.controller;
 
-import com.example.excel.feature.response.InputExcelResponse;
-import com.example.excel.feature.service.ExcelService;
+import com.feature.excel.response.InputExcelResponse;
+import com.feature.excel.service.ExcelService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 public class ExcelController {
 
     private final ExcelService excelService;
+
+    @PostMapping("/import")
+    public ResponseEntity<T> importExcel(@RequestParam("file") MultipartFile file) throws Exception {
+
+        return excelService.importExcel(file);
+    }
 
     // Excel To Entity List
     @PostMapping("/input")

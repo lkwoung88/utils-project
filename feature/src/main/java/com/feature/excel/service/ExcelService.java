@@ -1,18 +1,22 @@
-package com.example.excel.feature.service;
+package com.feature.excel.service;
 
-import com.example.excel.feature.entity.Book;
-import com.example.excel.feature.entity.Cd;
-import com.example.excel.feature.header.ExcelHeader;
-import com.example.excel.feature.response.InputExcelResponse;
+import com.feature.excel.entity.Book;
+import com.feature.excel.entity.Cd;
+import com.feature.excel.header.ExcelHeader;
+import com.feature.excel.object.ExcelImporter;
+import com.feature.excel.object.factory.ExcelImporterFactory;
+import com.feature.excel.response.InputExcelResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -209,5 +213,17 @@ public class ExcelService {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);
         return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    }
+
+    public ResponseEntity<T> importExcel(MultipartFile file) throws Exception {
+
+        List<ExcelImporter> excelImporters = ExcelImporterFactory.createExcelImporter(file);
+
+        excelImporters.forEach(excelImporter -> {
+
+            excelImporter.importExcel();
+        });
+
+        return ResponseEntity.ok(null);
     }
 }

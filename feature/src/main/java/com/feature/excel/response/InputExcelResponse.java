@@ -1,4 +1,4 @@
-package com.example.excel.feature.response;
+package com.feature.excel.response;
 
 import lombok.Data;
 
